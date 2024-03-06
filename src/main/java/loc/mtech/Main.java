@@ -1,10 +1,14 @@
 package loc.mtech;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import processing.core.PApplet;
 
 public class Main extends PApplet {
+    private static final Logger logger = LogManager.getLogger(Main.class.getName());
     public static void main(String[] args) {
-        PApplet.main("loc.mtech.Main");// Run The App
+        logger.info("This is a test");
+//        PApplet.main("loc.mtech.Main");// Run The App
     }
 
     @Override
