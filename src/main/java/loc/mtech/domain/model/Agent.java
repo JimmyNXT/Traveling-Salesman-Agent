@@ -10,6 +10,7 @@ public class Agent {
 
     int id;
     Node current_node;
+    List<HeuristicInterface> heuristics;
 
     List<Integer> visitedNodeIds;
 }
