@@ -32,7 +32,7 @@ public class Button {
     public void update() {
         if (this.visable) {
             if ((this.applet.mousePressed) &&
-                    (this.applet.mouseButton == this.applet.LEFT) && (!this.pressed)) {
+                    (this.applet.mouseButton == this.applet.LEFT) /*&& (!this.pressed)*/) {
                 this.pressed = true;
                 if (this.applet.mouseX >= this.pos.x && (this.applet.mouseX <= this.pos.x + this.width) && (this.applet.mouseY >= this.pos.y && (this.applet.mouseY <= this.pos.y + this.width))) {
                     this.clicked = true;
