@@ -1,0 +1,2 @@
+class IHeuristic:
+    pass
