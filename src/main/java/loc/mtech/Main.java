@@ -1,6 +1,6 @@
 package loc.mtech;
 
-import loc.mtech.domain.components.Button;
+import loc.mtech.ui.components.Button;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

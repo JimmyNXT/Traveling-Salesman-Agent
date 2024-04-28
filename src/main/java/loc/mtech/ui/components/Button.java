@@ -1,4 +1,4 @@
-package loc.mtech.domain.components;
+package loc.mtech.ui.components;
 
 import processing.core.PVector;
 import processing.core.PApplet;
@@ -12,7 +12,7 @@ public class Button {
     private String text;
     private Boolean pressed;
     private Boolean clicked;
-    private Boolean visable;
+    private Boolean visible;
     private PApplet applet;
 
     public Button(PApplet applet, int x, int y, float width, float height, String text, int red, int green, int blue) {
@@ -26,11 +26,11 @@ public class Button {
         this.text = text;
         this.pressed = false;
         this.clicked = false;
-        this.visable = true;
+        this.visible = true;
     }
 
     public void update() {
-        if (this.visable) {
+        if (this.visible) {
             if ((this.applet.mousePressed) &&
                     (this.applet.mouseButton == this.applet.LEFT) /*&& (!this.pressed)*/) {
                 this.pressed = true;
@@ -109,12 +109,12 @@ public class Button {
         this.clicked = clicked;
     }
 
-    public Boolean getVisable() {
-        return visable;
+    public Boolean getVisible() {
+        return visible;
     }
 
-    public void setVisable(Boolean visable) {
-        this.visable = visable;
+    public void setVisible(Boolean visible) {
+        this.visible = visible;
     }
 
     public PApplet getApplet() {
