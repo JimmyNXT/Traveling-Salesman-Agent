@@ -1,2 +1,0 @@
-# from vertex import Vertex
-
