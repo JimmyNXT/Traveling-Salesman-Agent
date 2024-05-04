@@ -1,12 +1,12 @@
 import csv
-from pygame import Vector2, surface, draw, display
+from pygame import Vector2, Surface, draw, display
 import random
 
 class Vertex:
-    def __init__(self, id: int, window:surface, position:Vector2) -> None:
+    def __init__(self, id: int, window:Surface, position:Vector2) -> None:
         self.id:int = id
         self.neighbours:dict[int, float]={}
-        self.window:surface = window
+        self.window:Surface = window
         self.position:Vector2 = position
         self.force:Vector2 = Vector2(0,0)
     
@@ -39,9 +39,9 @@ class Vertex:
         
 
 class Graph:
-    def __init__(self, window:surface) -> None:
+    def __init__(self, window:Surface) -> None:
         self.vertexes:dict[int, Vertex] = {}
-        self.window:surface = window
+        self.window:Surface = window
         w, h = display.get_surface().get_size()
         self.center:Vector2 = Vector2(w/2,h/2)
         self.gravity_constant = 1.1
@@ -62,9 +62,9 @@ class Graph:
             graph_data:list[list[float]] = []
 
             for row in csv_reader:
-                line_data:list[int]=[]
+                line_data:list[float]=[]
                 for cell in row:
-                    line_data.append(cell)
+                    line_data.append(float(cell))
                 graph_data.append(line_data) 
             
             row_count = len(graph_data)
@@ -95,7 +95,14 @@ class Graph:
                 lines.append((vertex.id, n))
         
         for line in lines:
-            draw.line(self.window, "blue", self.vertexes.get(line[0]).get_position(),self.vertexes.get(line[1]).get_position())
+            draw.line(
+                    self.window, 
+                    "blue", 
+                    self.vertexes.get(line[0]).get_position(),
+                    self.vertexes.get(line[1]).get_position())
+
+    def get_neighbours(self, id:int):
+        return self.vertexes.get(id).neighbours.keys()
     
     def update(self):
         for vertex in self.vertexes.values():
