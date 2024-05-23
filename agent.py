@@ -32,6 +32,12 @@ class Agent:
         if len(set(self.graph.vertexes) - len(set(self.viseted_vertexes))) == 0:
             self.done = True
 
+    def reset(self):
+        self.current_vertex_id = 0
+        self.viseted_vertexes = []
+        self.distance_traveled = 0
+        self.done = False
+
     def draw(self):
         if self.done:
             return

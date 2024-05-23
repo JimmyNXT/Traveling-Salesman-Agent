@@ -1,2 +1,0 @@
-def handleTest():
-    print("Test")
