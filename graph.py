@@ -45,7 +45,7 @@ class Graph:
         self.vertexes:dict[int, Vertex] = {}
         self.window:Surface = window
         w, h = display.get_surface().get_size()
-        self.center:Vector2 = Vector2(w/2,h/2)
+        self.center:Vector2 = Vector2(w/3,h/2)
         self.gravity_constant = 1.1
         self.force_constant = 100
     
