@@ -2,6 +2,8 @@ import csv
 from pygame import Vector2, Surface, draw, display
 import random
 
+from pygame.color import Color
+
 class Vertex:
     def __init__(self, id: int, window:Surface, position:Vector2) -> None:
         self.id:int = id
@@ -13,8 +15,8 @@ class Vertex:
     def add_edge(self, vertex_id:int, distance:float):
         self.neighbours.update({vertex_id: distance})
     
-    def draw(self):
-        draw.circle(self.window, "blue", [self.position.x, self.position.y], 10)
+    def draw(self, colour: Color):
+        draw.circle(self.window, colour, [self.position.x, self.position.y], 10)
 
     def get_position(self):
         return [self.position.x, self.position.y]
@@ -90,7 +92,7 @@ class Graph:
     def draw(self):
         lines:set[list[int, int]] = []
         for vertex in self.vertexes.values():
-            vertex.draw()
+            vertex.draw(Color(0, 0, 255))
             for n in vertex.neighbours.keys():
                 lines.append((vertex.id, n))
         
@@ -101,8 +103,12 @@ class Graph:
                     self.vertexes.get(line[0]).get_position(),
                     self.vertexes.get(line[1]).get_position())
 
-    def get_neighbours(self, id:int):
-        return self.vertexes.get(id).neighbours.keys()
+    def get_neighbours(self, id:int) -> list[int]:
+        vertex:Vertex|None = self.vertexes.get(id)
+        if vertex:
+            return list(vertex.neighbours.keys())
+
+        raise IndexError("Could not find Vertex")
     
     def update(self):
         for vertex in self.vertexes.values():

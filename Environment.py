@@ -14,3 +14,9 @@ class Environment:
 
         for agent in self.agents.values():
             agent.update()
+
+    def draw(self):
+        self.graph.draw()
+
+        for agent in self.agents.values():
+            agent.draw()

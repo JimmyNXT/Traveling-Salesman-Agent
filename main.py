@@ -25,7 +25,7 @@ heuristics:list[IHeuristic] = []
 heuristics.append(RandomHeuristic(graph,0))
 
 agents:dict[int, Agent] = {}
-agents.update({0: Agent(0, heuristics, {})})
+agents.update({0: Agent(window, graph, 0, pygame.Color(255, 0, 0), heuristics, {0:1}, 0) })
 
 environment = Environment(window=window, graph=graph, agents=agents)
 
@@ -39,7 +39,7 @@ while True:
             sys.exit()
      
     window.fill((0,0,0))    
-    graph.update()
-    graph.draw()
+    environment.update()
+    environment.draw()
     pygame.display.update()
     FramePerSec.tick(FPS)
