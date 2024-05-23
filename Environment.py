@@ -3,11 +3,16 @@ from pygame import Surface
 from graph import Graph
 from agent import Agent
 
+
 class Environment:
     def __init__(self, window:Surface, graph:Graph, agents:dict[int, Agent]) -> None:
         self.window:Surface = window
         self.graph:Graph = graph
         self.agents:dict[int, Agent] = agents
+        self.animate_graph:bool = True
+
+    def setShouldAnimateGraph(self, shouldAnimateGraph:bool):
+        self.animate_graph = shouldAnimateGraph
 
     def update(self):
         self.graph.update()
@@ -16,7 +21,8 @@ class Environment:
             agent.update()
 
     def draw(self):
-        self.graph.draw()
+        if self.animate_graph:
+            self.graph.draw()
 
         for agent in self.agents.values():
             agent.draw()
