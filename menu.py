@@ -3,6 +3,8 @@ import pygame
 from pygame import Rect, Surface, Color
 from pygame.font import Font
 
+from environment import Environment
+
 class Button():
     def __init__(self, window:Surface, rectangle:Rect, text:str, handleClick:Callable) -> None:
         self.font:Font = pygame.font.Font('freesansbold.ttf', 32)
@@ -35,13 +37,19 @@ class Button():
 
 
 class Menu():
-    def __init__(self, window:Surface) -> None:
+    def __init__(self, window:Surface, environment:Environment) -> None:
         self.window:Surface = window
+        self.environment:Environment = environment
         self.buttons:list[Button] = []
-        pass
 
-    def add_button(self, button:Button):
-        self.buttons.append(button)
+
+
+        self.buttons.append(Button(
+                window,
+                pygame.Rect(1050, 10, 400, 50),
+                "Toggle Graph Animation",
+                self.environment.toggleGraphAnimation,
+            ))
 
     def draw(self):
         for button in self.buttons:

@@ -1,4 +1,3 @@
-from os import walk
 import pygame
 from pygame.locals import QUIT
 import sys
@@ -28,26 +27,10 @@ heuristics.append(RandomHeuristic(graph, 0))
 
 environment = Environment(window=window, graph=graph)
 environment.add_agent(
-    Agent(window, graph, 0, pygame.Color(255, 0, 0), heuristics, {0: 1}, 0)
+        Agent(window, graph,0,[],0)
 )
 
-menu = Menu(window)
-
-
-def handle_toggle_grapg_animation():
-    environment.animate_graph = not environment.animate_graph
-
-
-animate_graph_button = Button(
-    window,
-    pygame.Rect(1050, 10, 400, 50),
-    "Toggle Graph Animation",
-    handle_toggle_grapg_animation,
-)
-menu.add_button(animate_graph_button)
-
-
-# c:/users/jimmynxt/onedrive/documents/github/traveling-salesman-agent
+menu = Menu(window, environment)
 
 run = True
 while run:

@@ -1,27 +1,21 @@
-from csv import QUOTE_ALL
-from os import walk
 
-from pygame import Color, Surface
+from pygame import Surface
 from graph import Graph, Vertex
 from logger import Logger
-from weighted_heuristic import IHeuristic
+from weighted_heuristic import WeightedHeuristic
 
 class Agent:
     def __init__(self, 
                  window:Surface, 
                  graph:Graph, 
                  id:int,
-                 colour: Color,
-                 heuristics:list[IHeuristic], 
-                 heuristic_weights:dict[int,float],
+                 heuristic_weights:list[WeightedHeuristic],
                  starting_vertex_id: int
                  ) -> None:
         self.window:Surface = window
         self.graph:Graph = graph
         self.id:int = id
-        self.colour:Color = colour
-        self.heuristics:list[IHeuristic] = heuristics
-        self.heuristic_weights:dict[int,float] = heuristic_weights 
+        self.weighted_heuristics:list[WeightedHeuristic] = heuristic_weights 
         self.current_vertex_id:int = starting_vertex_id 
         self.viseted_vertexes:list[int] = []
         self.distance_traveled:float = 0
@@ -29,26 +23,18 @@ class Agent:
         self.done = False
 
     def _check_done(self):
-        if len(set(self.graph.vertexes) - len(set(self.viseted_vertexes))) == 0:
+        if (len(self.graph.vertexes.keys()) - len(self.viseted_vertexes)) <= 0:
             self.done = True
+
+    def mutate(self):
+        for weighted_heuristic in self.weighted_heuristics:
+            weighted_heuristic.mutate()
 
     def reset(self):
         self.current_vertex_id = 0
         self.viseted_vertexes = []
         self.distance_traveled = 0
         self.done = False
-
-    def draw(self):
-        if self.done:
-            return
-
-        vertex_ids:list[int] = self.viseted_vertexes
-        vertex_ids.append(self.current_vertex_id)
-
-        for vertex_id in vertex_ids:
-            curr_vertex:Vertex|None = self.graph.vertexes.get(vertex_id)
-            if curr_vertex:
-                curr_vertex.draw(self.colour)
 
     def update(self):
         if self.done:
@@ -59,6 +45,7 @@ class Agent:
         vertex_values:dict[int,float] = {}
 
         if len(avaliable_vertex_ids) <= 0:
+            self.done = True
             return
 
         for vertex_id in avaliable_vertex_ids:
@@ -67,35 +54,33 @@ class Agent:
         for vertex_id in avaliable_vertex_ids:
             vertex_value = 0
             
-            for heuristic in self.heuristics:
-                heuristic_weight:float|None = self.heuristic_weights.get(heuristic.id)
-                if not heuristic_weight:
-                    raise IndexError("No weight for heuristic with id '" + str(heuristic.id) + ".")
-                vertex_value = (
-                        vertex_value + 
-                        (
-                            heuristic.get_edge_value(
-                                current_vertex_id = self.current_vertex_id,
-                                vertex_id=vertex_id,
-                                visited=self.viseted_vertexes) * heuristic_weight
-                        ))
+            for weighted_heuristic in self.weighted_heuristics:
+                vertex_value = vertex_value + weighted_heuristic.get_weighted_edge_value(
+                        self.current_vertex_id,
+                        vertex_id,
+                        self.viseted_vertexes[0],
+                        self.viseted_vertexes
+                        )  
 
             vertex_values.update({vertex_id: vertex_value})
 
-        next_vertex_id:int = max(vertex_values, key=vertex_values.get)
-
+        next_vertex_id:int = max(zip(vertex_values.values(), vertex_values.keys()))[1]
+        
         current_vertex:Vertex|None = self.graph.vertexes.get(self.current_vertex_id)
 
-        if not current_vertex:
+        if current_vertex is None:
             raise IndexError("Unable to find current vertex in graph")
+        
 
-        next_vertex_distance:float|None = current_vertex.neighbours.get(next_vertex_id)
+        next_vertex:Vertex|None = self.graph.vertexes.get(next_vertex_id)
 
-        if not next_vertex_distance:
+        if next_vertex is None:
             raise IndexError("Unable to find next vertex in graph")
+        
+       
 
-        self.distance_traveled = self.distance_traveled + next_vertex_distance
-        self.viseted_vertexes.append(self.current_vertex_id)
+        self.distance_traveled = self.distance_traveled + current_vertex.position.distance_to(next_vertex.position)
+        self.viseted_vertexes.insert(0, self.current_vertex_id)
         self.current_vertex_id = next_vertex_id
 
 
