@@ -90,7 +90,9 @@ class Environment:
     def print_stats(self):
         position = 10, 10
         text:list[str] = [
-                "Test 123", "Test 321", "Hello"]
+                "Graph Physics: " + str(self.animate_graph) , 
+                "Agents Running: " + str(self.run_agents), 
+                "Agent Count: " + str(len(self.agents.keys()))]
 
         lable:list[Surface] = []
 

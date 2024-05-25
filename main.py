@@ -20,15 +20,9 @@ window = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Traveling Salesman")
 
 graph = Graph(window)
-graph.load_graph("./data/graph_1.csv")
-
-heuristics: list[IHeuristic] = []
-heuristics.append(RandomHeuristic(graph, 0))
-
+graph.load_graph("./data/graph_2.csv"
+                 )
 environment = Environment(window=window, graph=graph)
-environment.add_agent(
-        Agent(window, graph,0,[],0)
-)
 
 menu = Menu(window, environment)
 

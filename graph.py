@@ -2,6 +2,7 @@ import csv
 from pygame import Vector2, Surface, draw, display
 import random
 
+import pygame
 from pygame.color import Color
 
 class Vertex:
@@ -11,17 +12,37 @@ class Vertex:
         self.window:Surface = window
         self.position:Vector2 = position
         self.force:Vector2 = Vector2(0,0)
+        self.radius:int = 10
+        self.clicked:bool = False
     
     def add_edge(self, vertex_id:int, distance:float):
         self.neighbours.update({vertex_id: distance})
     
     def draw(self, colour: Color):
-        draw.circle(self.window, colour, [self.position.x, self.position.y], 10)
+        mouse_position:Vector2 = Vector2(pygame.mouse.get_pos())
+
+        if mouse_position.distance_to(self.position) <= self.radius:
+            if pygame.mouse.get_pressed()[0]  == 1:
+                self.clicked = True
+            else:
+                self.clicked = False
+        else:
+            if self.clicked and pygame.mouse.get_pressed()[0]  == 0:
+                self.clicked = False
+
+        if self.clicked:
+            self.position = mouse_position
+            self.force = Vector2(0, 0)
+        
+
+        draw.circle(self.window, colour, [self.position.x, self.position.y], self.radius)
 
     def get_position(self):
         return [self.position.x, self.position.y]
     
     def update(self):
+        if self.clicked:
+            return
         self.position = self.position + self.force
     
     def __repr__(self):
@@ -47,7 +68,7 @@ class Graph:
         w, h = display.get_surface().get_size()
         self.center:Vector2 = Vector2(w/3,h/2)
         self.gravity_constant = 1.1
-        self.force_constant = 100
+        self.force_constant = 1000
     
     def add_vertex(self, vertex:Vertex):
         if vertex.id not in self.vertexes:
@@ -120,16 +141,33 @@ class Graph:
                 if vertexA.id != vertexB.id:
                     pos:Vector2 = vertexA.position
                     dir:Vector2 = pos - vertexB.position
-                    force = (dir / (dir.magnitude() * dir.magnitude())) * self.force_constant
+                    force = Vector2(0, 0)
+                    try:
+                        force = (dir / (dir.magnitude() * dir.magnitude())) * -self.force_constant
+                    except:
+                        pass
                     vertexA.force = vertexA.force - force
                     vertexB.force = vertexB.force + force
         
         for vertex in self.vertexes.values():
             edges:dict[int, float]=vertex.neighbours
             for vertex_id in edges.keys():
-                dir:Vector2 = vertex.position - self.vertexes.get(vertex_id).position
-                dir.scale_to_length(float(edges.get(vertex_id)))
-                vertex.force = vertex.force + dir
+                
+                current_vertex:Vertex|None = self.vertexes.get(vertex_id)
+                if current_vertex is None:
+                    continue
+                
+                dir:Vector2 = vertex.position - current_vertex.position
+
+                current_edge:float|None = edges.get(vertex_id)
+                if current_edge is None:
+                    continue
+
+                try:
+                    dir.scale_to_length(current_edge)
+                    vertex.force = vertex.force + dir
+                except:
+                    pass
 
         for vertex in self.vertexes.values():
             vertex.update()

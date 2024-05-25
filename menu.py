@@ -51,6 +51,13 @@ class Menu():
                 self.environment.toggleGraphAnimation,
             ))
 
+        self.buttons.append(Button(
+                window,
+                pygame.Rect(1050, 70, 400, 50),
+                "Import Graph",
+                self.environment.toggleGraphAnimation,
+            ))
+
     def draw(self):
         for button in self.buttons:
             button.draw()
