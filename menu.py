@@ -54,8 +54,15 @@ class Menu():
         self.buttons.append(Button(
                 window,
                 pygame.Rect(1050, 70, 400, 50),
-                "Import Graph",
-                self.environment.toggleGraphAnimation,
+                "Run Agents",
+                self.environment.toggleRunAgents,
+            ))
+
+        self.buttons.append(Button(
+                window,
+                pygame.Rect(1050, 130, 400, 50),
+                "Reset Agents",
+                self.environment.reset_agents,
             ))
 
     def draw(self):

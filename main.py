@@ -20,7 +20,7 @@ window = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Traveling Salesman")
 
 graph = Graph(window)
-graph.load_graph("./data/graph_2.csv"
+graph.load_graph("./data/graph_3.csv"
                  )
 environment = Environment(window=window, graph=graph)
 
@@ -38,7 +38,7 @@ while run:
     environment.draw()
     menu.draw()
     pygame.display.update()
-    FramePerSec.tick(FPS)
+    # FramePerSec.tick(FPS)
 
 pygame.quit()
 sys.exit()

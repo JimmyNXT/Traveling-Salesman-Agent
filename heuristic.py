@@ -12,7 +12,7 @@ class IHeuristic:
         self,
         current_vertex_id: int,
         next_vertex_id: int,
-        previous_vertex_id: int,
+        previous_vertex_id: int|None,
         visited: list[int],
     ) -> float:
         raise NotImplementedError("This Function has not been implemented")
@@ -27,11 +27,10 @@ class RandomHeuristic(IHeuristic):
         self,
         current_vertex_id: int,
         next_vertex_id: int,
-        previous_vertex_id: int,
+        previous_vertex_id: int|None,
         visited: list[int],
     ) -> float:
-        return random.randrange(0, len(self.graph.vertexes))
-
+        return random.randrange(0, len(self.graph.vertexes.keys()))
 
 class HasVisitedHeuristic(IHeuristic):
     def __init__(self, graph: Graph, id: int) -> None:
@@ -42,13 +41,14 @@ class HasVisitedHeuristic(IHeuristic):
         self,
         current_vertex_id: int,
         next_vertex_id: int,
-        previous_vertex_id: int,
+        previous_vertex_id: int|None,
         visited: list[int],
     ) -> float:
         if next_vertex_id in visited:
             return -1
         else:
             return 1
+
 
 
 class DistanceHeuristic(IHeuristic):
@@ -60,7 +60,7 @@ class DistanceHeuristic(IHeuristic):
         self,
         current_vertex_id: int,
         next_vertex_id: int,
-        previous_vertex_id: int,
+        previous_vertex_id: int|None,
         visited: list[int],
     ) -> float:
         current_vertex: Vertex | None = self.graph.vertexes.get(current_vertex_id)
@@ -83,10 +83,13 @@ class DirectionChangeHeuristic(IHeuristic):
         self,
         current_vertex_id: int,
         next_vertex_id: int,
-        previous_vertex_id: int,
+        previous_vertex_id: int|None,
         visited: list[int],
     ) -> float:
+        if previous_vertex_id is None:
+            return float("inf")
         current_vertex: Vertex | None = self.graph.vertexes.get(current_vertex_id)
+
         if current_vertex is None:
             return float("inf")
 
@@ -113,10 +116,10 @@ class AngleDeltaHeuristic(IHeuristic):
         self,
         current_vertex_id: int,
         next_vertex_id: int,
-        previous_vertex_id: int,
+        previous_vertex_id: int|None,
         visited: list[int],
     ) -> float:
-        vertexes_copy: dict[int, Vertex] = self.graph.vertexes
+        vertexes_copy: dict[int, Vertex] = self.graph.vertexes.copy()
 
         for vertex_id in visited:
             try:

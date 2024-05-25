@@ -1,5 +1,5 @@
 
-from pygame import Surface
+from pygame import Surface, Vector2
 from graph import Graph, Vertex
 from logger import Logger
 from weighted_heuristic import WeightedHeuristic
@@ -22,8 +22,41 @@ class Agent:
         self.logger = Logger("Agent " + str(self.id))
         self.done = False
 
+    def __lt__(self, obj):
+        if self.distance_traveled != obj.distance_traveled:
+            return ((self.distance_traveled) < (obj.distance_traveled)) 
+        else:
+            return (len(self.viseted_vertexes) < len(obj.viseted_vertexes))
+  
+    def __gt__(self, obj):
+        return ((self.distance_traveled) > (obj.distance_traveled)) 
+  
+    def __le__(self, obj): 
+        return ((self.distance_traveled) <= (obj.distance_traveled)) 
+  
+    def __ge__(self, obj): 
+        return ((self.distance_traveled) >= (obj.distance_traveled)) 
+  
+    def __eq__(self, obj): 
+        return (self.distance_traveled == obj.distance_traveled)
+
+    def __repr__(self):
+        return "{" + str(self.id) + ":" + str(self.distance_traveled) + "}"
+
     def _check_done(self):
-        if (len(self.graph.vertexes.keys()) - len(self.viseted_vertexes)) <= 0:
+        if len(self.viseted_vertexes) > len(self.graph.vertexes.keys()) * 10:
+            self.done = True
+            return
+
+        graph_vertexes_copy = self.graph.vertexes.copy()
+
+        for vertex_id in self.viseted_vertexes:
+            try:
+                graph_vertexes_copy.pop(vertex_id)
+            except:
+                pass
+
+        if len(graph_vertexes_copy.keys()) <= 0:
             self.done = True
 
     def mutate(self):
@@ -35,6 +68,20 @@ class Agent:
         self.viseted_vertexes = []
         self.distance_traveled = 0
         self.done = False
+
+    def get_path_string(self):
+        visited_rev:list[int] = self.viseted_vertexes.copy()
+        visited_rev.reverse()
+        return "->".join(map(str,visited_rev))
+    
+    def get_genes(self) -> dict[int,float]:
+        gene_dict:dict[int, float] = {}
+
+        for weighted_heuristic in self.weighted_heuristics:
+            gene_dict.update({weighted_heuristic.heuristic.id: weighted_heuristic.weight})
+
+        return gene_dict
+
 
     def update(self):
         if self.done:
@@ -53,16 +100,24 @@ class Agent:
 
         for vertex_id in avaliable_vertex_ids:
             vertex_value = 0
+
+            previous_vertex_id = None
+
+            if len(self.viseted_vertexes) >= 1:
+                previous_vertex_id = self.viseted_vertexes[0]
+
             
             for weighted_heuristic in self.weighted_heuristics:
                 vertex_value = vertex_value + weighted_heuristic.get_weighted_edge_value(
                         self.current_vertex_id,
                         vertex_id,
-                        self.viseted_vertexes[0],
+                        previous_vertex_id,
                         self.viseted_vertexes
                         )  
 
             vertex_values.update({vertex_id: vertex_value})
+
+        # print(vertex_values)
 
         next_vertex_id:int = max(zip(vertex_values.values(), vertex_values.keys()))[1]
         
@@ -78,9 +133,14 @@ class Agent:
             raise IndexError("Unable to find next vertex in graph")
         
        
+        neighbour_distance = current_vertex.neighbours.get(next_vertex_id)
 
-        self.distance_traveled = self.distance_traveled + current_vertex.position.distance_to(next_vertex.position)
+        if neighbour_distance is None:
+            neighbour_distance = float('inf')
+
+        self.distance_traveled =self.distance_traveled + neighbour_distance
         self.viseted_vertexes.insert(0, self.current_vertex_id)
         self.current_vertex_id = next_vertex_id
+        self._check_done()
 
 

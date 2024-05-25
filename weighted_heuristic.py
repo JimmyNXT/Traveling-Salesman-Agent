@@ -1,3 +1,4 @@
+import random
 from heuristic import IHeuristic
 
 
@@ -10,7 +11,7 @@ class WeightedHeuristic:
         self,
         current_vertex_id: int,
         next_vertex_id: int,
-        previous_vertex_id: int,
+        previous_vertex_id: int|None,
         visited: list[int],
     ) -> float:
 
@@ -19,5 +20,9 @@ class WeightedHeuristic:
         )
 
     def mutate(self):
-        pass
+        should_mutate:bool = random.uniform(0, 1) > 0.05
+        if not should_mutate:
+            return
+
+        self.weight = self.weight + random.uniform(-1, 1)
 

@@ -46,7 +46,7 @@ class Vertex:
         self.position = self.position + self.force
     
     def __repr__(self):
-        return "Vertex; " + str(self.id)
+        return "vertex->" + str(self.id)
     
     # def __str__(self):
     #     return str(self.id)
@@ -68,15 +68,24 @@ class Graph:
         w, h = display.get_surface().get_size()
         self.center:Vector2 = Vector2(w/3,h/2)
         self.gravity_constant = 1.1
-        self.force_constant = 1000
+        self.force_constant = 700
     
     def add_vertex(self, vertex:Vertex):
-        if vertex.id not in self.vertexes:
+        if vertex.id not in self.vertexes.keys():
             self.vertexes.update({vertex.id: vertex})
 
     def add_edge(self, vertex_a_id:int, vertex_b_id:int, distance:float):
-        self.vertexes.get(vertex_a_id).add_edge(vertex_id=vertex_b_id, distance=distance)
-        self.vertexes.get(vertex_b_id).add_edge(vertex_id=vertex_a_id, distance=distance)
+        vertex_a:Vertex|None = self.vertexes.get(vertex_a_id)
+        if vertex_a is None:
+            raise IndexError("Unable to fine vertex A")
+
+        vertex_b:Vertex|None = self.vertexes.get(vertex_b_id)
+        if vertex_b is None:
+            raise IndexError("Unable to fine vertex B")
+
+
+        vertex_a.add_edge(vertex_id=vertex_b_id, distance=distance)
+        vertex_b.add_edge(vertex_id=vertex_a_id, distance=distance)
         
     
     def load_graph(self, path:str):
