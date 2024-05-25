@@ -1,4 +1,5 @@
 
+from typing import List
 from pygame import Surface, Vector2
 from graph import Graph, Vertex
 from logger import Logger
@@ -23,8 +24,13 @@ class Agent:
         self.done = False
 
     def __lt__(self, obj):
+        if self.done and not obj.done:
+            return True
+        if not self.done and obj.done:
+            return False
+
         if self.distance_traveled != obj.distance_traveled:
-            return ((self.distance_traveled) < (obj.distance_traveled)) 
+            return ((self.distance_traveled) < (obj.distance_traveled))
         else:
             return (len(self.viseted_vertexes) < len(obj.viseted_vertexes))
   
@@ -41,7 +47,11 @@ class Agent:
         return (self.distance_traveled == obj.distance_traveled)
 
     def __repr__(self):
-        return "{" + str(self.id) + ":" + str(self.distance_traveled) + "}"
+        return ", ".join([
+                "ID: " + str(self.id),
+                "Distance: " + str(self.distance_traveled),
+                "Done: " + str(self.done)
+                ]) + "\n"
 
     def _check_done(self):
         if len(self.viseted_vertexes) > len(self.graph.vertexes.keys()) * 10:

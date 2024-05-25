@@ -1,12 +1,14 @@
 import csv
-from pygame import Vector2, Surface, draw, display
+from pygame import Rect, Vector2, Surface, draw, display
 import random
 
 import pygame
 from pygame.color import Color
+from pygame.font import Font
 
 class Vertex:
     def __init__(self, id: int, window:Surface, position:Vector2) -> None:
+        self.font:Font = pygame.font.Font('freesansbold.ttf', 10)
         self.id:int = id
         self.neighbours:dict[int, float]={}
         self.window:Surface = window
@@ -36,6 +38,11 @@ class Vertex:
         
 
         draw.circle(self.window, colour, [self.position.x, self.position.y], self.radius)
+        text:Surface = self.font.render(str(self.id + 1), True, Color(0, 0, 0))
+        text_rect:Rect = text.get_rect()
+        text_rect.center = (int(self.position.x), int(self.position.y))
+
+        self.window.blit(self.font.render(str(self.id), True, Color(0, 0, 0)), text_rect )
 
     def get_position(self):
         return [self.position.x, self.position.y]
@@ -120,18 +127,29 @@ class Graph:
                         self.add_edge(i, j, float(graph_data[i][j]))
             
     def draw(self):
-        lines:set[list[int, int]] = []
+        lines:set[tuple[int,int]] = set()
         for vertex in self.vertexes.values():
-            vertex.draw(Color(0, 0, 255))
             for n in vertex.neighbours.keys():
-                lines.append((vertex.id, n))
+                lines.add((vertex.id, n))
         
         for line in lines:
+            vertex_a:Vertex|None = self.vertexes.get(line[0])
+            if vertex_a is None:
+                continue
+
+            vertex_b:Vertex|None = self.vertexes.get(line[1])
+
+            if vertex_b is None:
+                continue
             draw.line(
                     self.window, 
                     "blue", 
-                    self.vertexes.get(line[0]).get_position(),
-                    self.vertexes.get(line[1]).get_position())
+                    vertex_a.get_position(),
+                    vertex_b.get_position())
+
+        for vertex in self.vertexes.values():
+            vertex.draw(Color(0, 0, 255))
+
 
     def get_neighbours(self, id:int) -> list[int]:
         vertex:Vertex|None = self.vertexes.get(id)

@@ -1,4 +1,5 @@
 import random
+import sys
 from pygame import Color, Surface, fastevent
 import pygame
 from pygame.font import Font
@@ -44,6 +45,7 @@ class Environment:
         return heuristics
 
     def populate_agents(self):
+        self.agents.clear()
         for i in range(self.agent_count):
             weigted_heuristics: list[WeightedHeuristic] = []
             for heuristic in self.heuristics:
@@ -60,15 +62,17 @@ class Environment:
             )
 
     def agents_Done(self) -> bool:
+        done_counter: int = 0
         for agent in self.agents.values():
-            if not agent.done:
-                return False
-        return True
+            if done_counter >= self.reproduction_population:
+                return True
+            if agent.done:
+                done_counter = done_counter + 1
+        return False
 
     def mutate_agents(self):
         for agent in self.agents.values():
-            if agent.id >= self.reproduction_population:
-                agent.mutate()
+            agent.mutate()
 
     def toggleGraphAnimation(self):
         self.animate_graph = not self.animate_graph
@@ -81,17 +85,19 @@ class Environment:
         self.agents.update({len(self.agents.keys()): agent})
 
     def reset_agents(self):
-        for agent in self.agents.values():
-            agent.reset()
+        self.populate_agents()
+        # for agent in self.agents.values():
+        #     agent.reset()
 
     def propogate(self):
+        self.generation = self.generation + 1
         new_agents:dict[int,Agent] = {}
         for i in range(self.reproduction_population):
-            new_agent:Agent|None = self.get_fittest_agent()
+            new_agent = self.get_fittest_agent()
             if new_agent is None:
                 continue
+            self.agents.pop(new_agent.id, None)
             new_agent.id = i
-            self.agents.pop(new_agent.id)
             new_agents.update({new_agent.id: new_agent})
 
         while len(new_agents.keys()) < self.agent_count:
@@ -138,6 +144,9 @@ class Environment:
         
 
     def update(self):
+        if self.agents_Done():
+            self.propogate()
+
         if self.animate_graph:
             self.graph.update()
 
@@ -145,9 +154,7 @@ class Environment:
             for agent in self.agents.values():
                 agent.update()
 
-        if self.agents_Done():
-            self.propogate()
-
+        
     def get_fittest_agent(self) -> Agent | None:
         if len(self.agents.keys()) <= 0:
             return None
@@ -232,6 +239,8 @@ class Environment:
                     Color(0, 255, 0), 
                     current_vertex.get_position(),
                     previous_vertex.get_position())
+
+            previous_vertex_id = current_vertex_id
             
 
 
