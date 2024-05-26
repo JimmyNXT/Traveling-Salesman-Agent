@@ -221,6 +221,7 @@ class Environment:
         agent_stats: list[str] = []
 
         if fittest_agent is not None:
+            agent_stats: list[str] = []
             agent_stats.append("Generation: " + str(self.generation))
             agent_stats.append("Fittest Agent")
             agent_stats.append("---------------------")
@@ -231,8 +232,18 @@ class Environment:
             )
             agent_stats.append("Best Path : " + fittest_agent.get_path_string())
 
-        window_height: int = self.window.get_height()
-        self.print_list(agent_stats, 10, window_height - (20 + (22 * len(agent_stats))))
+            window_height: int = self.window.get_height()
+            self.print_list(agent_stats, 10, window_height - (20 + (22 * len(agent_stats))))
+
+
+            agent_gene_stats:list[str] = []
+            agent_genes = fittest_agent.get_genes()
+            agent_gene_stats.append("Genes")
+
+            for heuristic in self.heuristics:
+                agent_gene_stats.append(heuristic.name + ": " + str(agent_genes.get(heuristic.id)))
+
+            self.print_list(agent_gene_stats, 1050, 300)
 
     def draw_best_path(self):
         fittest_agent:Agent|None = self.get_fittest_agent()
