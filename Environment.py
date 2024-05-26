@@ -1,6 +1,6 @@
+from datetime import datetime
 import random
-import sys
-from pygame import Color, Surface, fastevent
+from pygame import Color, Surface
 import pygame
 from pygame.font import Font
 from graph import Graph, Vertex
@@ -78,10 +78,11 @@ class Environment:
             weigted_heuristics: list[WeightedHeuristic] = []
             for heuristic in self.heuristics:
                 weight = self.base_genes.copy().get(heuristic.id)
+                random.seed(datetime.now().timestamp())
                 if weight is None:
                     weight = random.uniform(-5, 5)
 
-                weight = float(weight) + float(random.uniform(0.1, 0.1))
+                weight = float(weight) + float(random.uniform(10, 10))
 
                 weigted_heuristics.append(WeightedHeuristic(weight, heuristic))
 

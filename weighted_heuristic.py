@@ -1,4 +1,6 @@
 import random
+from datetime import datetime
+
 from heuristic import IHeuristic
 
 
@@ -20,6 +22,7 @@ class WeightedHeuristic:
         )
 
     def mutate(self):
+        random.seed(datetime.now().timestamp())
         should_mutate:bool = random.uniform(0, 1) > -1
         if should_mutate:
             self.weight = self.weight + random.uniform(-1, 1)

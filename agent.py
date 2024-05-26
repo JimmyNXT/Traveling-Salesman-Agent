@@ -29,11 +29,11 @@ class Agent:
             return True
         elif not self.done and obj.done:
             return False
-        # elif not self.done and not obj.done:
-        #     s_list = list(dict.fromkeys(self.viseted_vertexes))
-        #     o_list = list(dict.fromkeys(obj.viseted_vertexes))
-        #
-        #     return (len(s_list) > len(o_list))
+        elif not self.done and not obj.done:
+            s_list = list(dict.fromkeys(self.viseted_vertexes))
+            o_list = list(dict.fromkeys(obj.viseted_vertexes))
+            print(len(s_list), len(o_list), str(len(s_list) > len(o_list)))
+            return (len(s_list) > len(o_list))
 
         elif self.distance_traveled != obj.distance_traveled:
             return ((self.distance_traveled) < (obj.distance_traveled))
