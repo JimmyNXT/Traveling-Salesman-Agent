@@ -156,3 +156,40 @@ class AngleDeltaHeuristic(IHeuristic):
             angle_sum = angle_sum + abs(init_angle - current_angle)
 
         return angle_sum / angle_count
+
+class DistanceToGraphHeuristic(IHeuristic):
+    def __init__(self, graph: Graph, id: int) -> None:
+        super().__init__(graph, id)
+        self.name = "Distance to Graph"
+
+    def get_edge_value(self, current_vertex_id: int, next_vertex_id: int, previous_vertex_id: int | None, visited: list[int]) -> float:
+        next_vertex: Vertex | None = self.graph.vertexes.get(next_vertex_id)
+        if next_vertex is None:
+            return float("inf")
+
+        vertexes_copy: dict[int, Vertex] = self.graph.vertexes.copy()
+
+        for vertex_id in visited:
+            try:
+                vertexes_copy.pop(vertex_id)
+            except:
+                pass
+
+        try:
+            vertexes_copy.pop(next_vertex_id)
+        except:
+            pass
+
+        node_count: int = len(vertexes_copy)
+
+        if node_count == 0:
+            return float("inf")
+        total_distance: float = 0
+
+        for vertexes_id in vertexes_copy.keys():
+            vertex = self.graph.vertexes.get(vertexes_id)
+            if vertex is None:
+                continue
+            total_distance = total_distance + next_vertex.position.distance_to(vertex.position)
+
+        return total_distance / node_count

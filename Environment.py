@@ -9,6 +9,7 @@ from heuristic import (
     AngleDeltaHeuristic,
     DirectionChangeHeuristic,
     DistanceHeuristic,
+    DistanceToGraphHeuristic,
     HasVisitedHeuristic,
     IHeuristic,
     RandomHeuristic,
@@ -40,7 +41,7 @@ class Environment:
         heuristics.append(DistanceHeuristic(self.graph, 2))
         heuristics.append(DirectionChangeHeuristic(self.graph, 3))
         heuristics.append(AngleDeltaHeuristic(self.graph, 4))
-        # heuristics.append(RandomHeuristic(self.graph, 5))
+        heuristics.append(DistanceToGraphHeuristic(self.graph, 5))
         # heuristics.append(RandomHeuristic(self.graph, 6))
         # heuristics.append(RandomHeuristic(self.graph, 6))
 
@@ -227,6 +228,7 @@ class Environment:
             agent_stats.append("---------------------")
             agent_stats.append("ID: " + str(fittest_agent.id))
             agent_stats.append("Distance: " + str(fittest_agent.distance_traveled))
+            agent_stats.append("Done: " + str(fittest_agent.done))
             agent_stats.append(
                 "Visited Count: " + str(len(fittest_agent.viseted_vertexes))
             )
