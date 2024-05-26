@@ -65,7 +65,7 @@ class Agent:
                 ]) + "\n"
 
     def _check_done(self):
-        if len(self.viseted_vertexes) > len(self.graph.vertexes.keys()) * 10:
+        if len(self.viseted_vertexes) > len(self.graph.vertexes.keys()) * 3:
             self.should_continue = False
             return
 
