@@ -31,7 +31,14 @@ class Agent:
             return False
 
         if not self.done and not obj.done:
-            return (len(self.viseted_vertexes) < len(obj.viseted_vertexes))
+            s_list = list(dict.fromkeys(self.viseted_vertexes))
+            o_list = list(dict.fromkeys(obj.viseted_vertexes))
+            s_len = len(s_list)
+            o_len = len(o_list)
+
+            if s_len != o_len:
+                return (s_len > o_len)
+
 
         if self.distance_traveled != obj.distance_traveled:
             return ((self.distance_traveled) < (obj.distance_traveled))
@@ -58,7 +65,7 @@ class Agent:
                 ]) + "\n"
 
     def _check_done(self):
-        if len(self.viseted_vertexes) > len(self.graph.vertexes.keys()) * 3:
+        if len(self.viseted_vertexes) > len(self.graph.vertexes.keys()) * 10:
             self.should_continue = False
             return
 

@@ -146,7 +146,7 @@ class Environment:
                     temp_new_agents.update({current_new_agent.id: current_new_agent})
             new_agents.update(temp_new_agents)
 
-        self.agents = {}
+        self.agents.clear()
 
         for agent in list(new_agents.values()):
             self.add_agent(agent)

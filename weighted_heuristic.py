@@ -20,9 +20,9 @@ class WeightedHeuristic:
         )
 
     def mutate(self):
-        should_mutate:bool = random.uniform(0, 1) > 0.05
+        should_mutate:bool = random.uniform(0, 1) < 0.2
         if not should_mutate:
             return
 
-        self.weight = self.weight + random.uniform(-1, 1)
+        self.weight = self.weight + random.uniform(-0.5, 0.5)
 
