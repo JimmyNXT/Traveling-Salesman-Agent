@@ -38,7 +38,7 @@ while run:
     environment.draw()
     menu.draw()
     pygame.display.update()
-    # FramePerSec.tick(FPS)
+    FramePerSec.tick(FPS)
 
 pygame.quit()
 sys.exit()

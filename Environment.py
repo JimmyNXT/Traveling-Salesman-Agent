@@ -14,6 +14,8 @@ from heuristic import (
     RandomHeuristic,
 )
 from weighted_heuristic import WeightedHeuristic
+from pathlib import Path
+import json
 
 
 class Environment:
@@ -24,36 +26,62 @@ class Environment:
         self.agents: dict[int, Agent] = {}
         self.animate_graph: bool = True
         self.run_agents: bool = False
+        self.base_genes: dict[int, float] = self.load_genes()
         self.heuristics: list[IHeuristic] = self.getHeuristics()
-        self.base_genes: dict[int, float] = {0: 1, 1: 100, 2: 1, 3: 1, 4: 1}
         self.agent_count: int = 100
         self.reproduction_population: int = 10
         self.populate_agents()
         self.generation:int = 0
+        self.is_propegating:bool = False
 
     def getHeuristics(self) -> list[IHeuristic]:
         heuristics: list[IHeuristic] = []
-        # heuristics.append(RandomHeuristic(self.graph, 0))
         heuristics.append(HasVisitedHeuristic(self.graph, 1))
         heuristics.append(DistanceHeuristic(self.graph, 2))
         heuristics.append(DirectionChangeHeuristic(self.graph, 3))
         heuristics.append(AngleDeltaHeuristic(self.graph, 4))
+        # heuristics.append(RandomHeuristic(self.graph, 5))
         # heuristics.append(RandomHeuristic(self.graph, 5))
         # heuristics.append(RandomHeuristic(self.graph, 6))
         # heuristics.append(RandomHeuristic(self.graph, 6))
 
         return heuristics
 
+    def load_genes(self) -> dict[int,float]:
+        gene_file_path = Path("./data/genes.json")
+        
+        if not gene_file_path.exists():
+            return {}
+        
+        gene_data:dict[int, float] = {} 
+        with open(gene_file_path, "r") as gene_file:
+            gene_data = json.load(gene_file)
+
+        gene_data = {int(k):float(v) for k,v in gene_data.items()}
+
+        return gene_data
+            
+
+    def save_genes(self):
+        fittest_agent = self.get_fittest_agent()
+        if fittest_agent is None:
+            return
+
+        genes:dict[int, float] = fittest_agent.get_genes()
+
+        with open("./data/genes.json", "w") as gene_file:
+            json.dump(genes, gene_file)
+
+
     def populate_agents(self):
-        self.agents.clear()
         for i in range(self.agent_count):
             weigted_heuristics: list[WeightedHeuristic] = []
             for heuristic in self.heuristics:
-                weight = self.base_genes.get(heuristic.id)
+                weight = self.base_genes.copy().get(heuristic.id)
                 if weight is None:
-                    weight = 0
+                    weight = random.uniform(-5, 5)
 
-                weight = weight + random.uniform(weight - 10, weight + 10)
+                weight = float(weight) + float(random.uniform(0.1, 0.1))
 
                 weigted_heuristics.append(WeightedHeuristic(weight, heuristic))
 
@@ -62,13 +90,19 @@ class Environment:
             )
 
     def agents_Done(self) -> bool:
-        done_counter: int = 0
+        done_counter: int = 0 
         for agent in self.agents.values():
             if done_counter >= self.reproduction_population:
                 return True
             if agent.done:
                 done_counter = done_counter + 1
-        return False
+
+        for agent in self.agents.values():
+            if agent.should_continue:
+                return False
+        
+        return True
+
 
     def mutate_agents(self):
         for agent in self.agents.values():
@@ -90,6 +124,8 @@ class Environment:
         #     agent.reset()
 
     def propogate(self):
+        self.is_propegating = True
+        self.save_genes()
         self.generation = self.generation + 1
         new_agents:dict[int,Agent] = {}
         for i in range(self.reproduction_population):
@@ -114,13 +150,14 @@ class Environment:
                     temp_new_agents.update({current_new_agent.id: current_new_agent})
             new_agents.update(temp_new_agents)
 
-        self.agents = {}
+        self.agents.clear()
 
         for agent in list(new_agents.values()):
             self.add_agent(agent)
 
         self.mutate_agents()
         self.reset_agents()
+        self.is_propegating = False
 
     def breed_agents(self, agent_a:Agent, agent_b:Agent) -> Agent:
         weigted_heuristics: list[WeightedHeuristic] = []
@@ -156,13 +193,13 @@ class Environment:
 
         
     def get_fittest_agent(self) -> Agent | None:
-        if len(self.agents.keys()) <= 0:
-            return None
-
-        agents: list[Agent] = list(self.agents.values())
-        agents.sort()
-
-        return agents[0]
+        fittest_agent: Agent|None = None
+        if len(self.agents.keys()) >= 1:
+            agents: list[Agent] = list(self.agents.copy().values())
+            agents.sort()
+            fittest_agent = agents[0]
+            
+        return fittest_agent
 
     def print_list(self, text: list[str], x: int, y: int):
         lable: list[Surface] = []
@@ -186,9 +223,9 @@ class Environment:
 
         fittest_agent = self.get_fittest_agent()
 
-        agent_stats: list[str] = []
 
         if fittest_agent is not None:
+            agent_stats: list[str] = []
             agent_stats.append("Generation: " + str(self.generation))
             agent_stats.append("Fittest Agent")
             agent_stats.append("---------------------")
@@ -199,15 +236,25 @@ class Environment:
             )
             agent_stats.append("Best Path : " + fittest_agent.get_path_string())
 
-        window_height: int = self.window.get_height()
-        self.print_list(agent_stats, 10, window_height - (20 + (22 * len(agent_stats))))
+            window_height: int = self.window.get_height()
+            self.print_list(agent_stats, 10, window_height - (20 + (22 * len(agent_stats))))
+
+
+            agent_gene_stats:list[str] = []
+            agent_genes = fittest_agent.get_genes()
+
+            for heuristic in self.heuristics:
+                agent_gene_stats.append(heuristic.name + ": " + str(agent_genes.get(heuristic.id)))
+
+            self.print_list(agent_gene_stats, 1050, 300)
+
 
     def draw_best_path(self):
         fittest_agent:Agent|None = self.get_fittest_agent()
 
         if fittest_agent is None:
             return
-        
+
         path: list[int] = fittest_agent.viseted_vertexes.copy()
         if len(path) <= 0:
             return

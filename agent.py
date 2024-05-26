@@ -22,40 +22,46 @@ class Agent:
         self.distance_traveled:float = 0
         self.logger = Logger("Agent " + str(self.id))
         self.done = False
+        self.should_continue:bool = True
 
     def __lt__(self, obj):
         if self.done and not obj.done:
             return True
-        if not self.done and obj.done:
+        elif not self.done and obj.done:
             return False
+        # elif not self.done and not obj.done:
+        #     s_list = list(dict.fromkeys(self.viseted_vertexes))
+        #     o_list = list(dict.fromkeys(obj.viseted_vertexes))
+        #
+        #     return (len(s_list) > len(o_list))
 
-        if self.distance_traveled != obj.distance_traveled:
+        elif self.distance_traveled != obj.distance_traveled:
             return ((self.distance_traveled) < (obj.distance_traveled))
         else:
             return (len(self.viseted_vertexes) < len(obj.viseted_vertexes))
   
-    def __gt__(self, obj):
-        return ((self.distance_traveled) > (obj.distance_traveled)) 
-  
-    def __le__(self, obj): 
-        return ((self.distance_traveled) <= (obj.distance_traveled)) 
-  
-    def __ge__(self, obj): 
-        return ((self.distance_traveled) >= (obj.distance_traveled)) 
-  
-    def __eq__(self, obj): 
-        return (self.distance_traveled == obj.distance_traveled)
+  #   def __gt__(self, obj):
+  #       return ((self.distance_traveled) > (obj.distance_traveled)) 
+  # 
+  #   def __le__(self, obj): 
+  #       return ((self.distance_traveled) <= (obj.distance_traveled)) 
+  # 
+  #   def __ge__(self, obj): 
+  #       return ((self.distance_traveled) >= (obj.distance_traveled)) 
+  # 
+  #   def __eq__(self, obj): 
+        # return (self.distance_traveled == obj.distance_traveled)
 
     def __repr__(self):
         return ", ".join([
                 "ID: " + str(self.id),
                 "Distance: " + str(self.distance_traveled),
                 "Done: " + str(self.done)
-                ]) + "\n"
+                ])
 
     def _check_done(self):
-        if len(self.viseted_vertexes) > len(self.graph.vertexes.keys()) * 10:
-            self.done = True
+        if len(self.viseted_vertexes) > len(self.graph.vertexes.keys()) * 3:
+            self.should_continue = False
             return
 
         graph_vertexes_copy = self.graph.vertexes.copy()
@@ -67,6 +73,7 @@ class Agent:
                 pass
 
         if len(graph_vertexes_copy.keys()) <= 0:
+            self.should_continue = False
             self.done = True
 
     def mutate(self):
@@ -78,6 +85,7 @@ class Agent:
         self.viseted_vertexes = []
         self.distance_traveled = 0
         self.done = False
+        self.should_continue = True
 
     def get_path_string(self):
         visited_rev:list[int] = self.viseted_vertexes.copy()
@@ -95,6 +103,9 @@ class Agent:
 
     def update(self):
         if self.done:
+            return
+
+        if not self.should_continue:
             return
 
         avaliable_vertex_ids:list[int] = self.graph.get_neighbours(self.current_vertex_id)
