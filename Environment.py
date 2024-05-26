@@ -1,6 +1,5 @@
 import random
-import sys
-from pygame import Color, Surface, fastevent
+from pygame import Color, Surface
 import pygame
 from pygame.font import Font
 from graph import Graph, Vertex
@@ -12,7 +11,6 @@ from heuristic import (
     DistanceToGraphHeuristic,
     HasVisitedHeuristic,
     IHeuristic,
-    RandomHeuristic,
 )
 from weighted_heuristic import WeightedHeuristic
 from pathlib import Path

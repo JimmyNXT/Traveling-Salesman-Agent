@@ -1,6 +1,4 @@
-
-from typing import List
-from pygame import Surface, Vector2
+from pygame import Surface
 from graph import Graph, Vertex
 from logger import Logger
 from weighted_heuristic import WeightedHeuristic
