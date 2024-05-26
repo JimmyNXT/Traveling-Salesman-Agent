@@ -62,12 +62,14 @@ class Menu():
                 window,
                 pygame.Rect(1050, 130, 400, 50),
                 "Reset Agents",
-                self.environment.reset_agents,
+                self.reset,
             ))
 
     def draw(self):
         for button in self.buttons:
             button.draw()
-
-
+    
+    def reset(self):
+        self.environment.reset_agents()
+        self.environment.generation = 0
 
