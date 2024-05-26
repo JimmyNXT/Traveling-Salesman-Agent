@@ -29,6 +29,9 @@ class Agent:
         if not self.done and obj.done:
             return False
 
+        if not self.done and not obj.done:
+            return (len(self.viseted_vertexes) < len(obj.viseted_vertexes))
+
         if self.distance_traveled != obj.distance_traveled:
             return ((self.distance_traveled) < (obj.distance_traveled))
         else:

@@ -2,10 +2,8 @@ import pygame
 from pygame.locals import QUIT
 import sys
 from environment import Environment
-from agent import Agent
 from graph import Graph
-from heuristic import IHeuristic, RandomHeuristic
-from menu import Button, Menu
+from menu import Menu
 
 pygame.init()
 vec = pygame.math.Vector2
