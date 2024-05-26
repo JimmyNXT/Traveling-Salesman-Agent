@@ -104,7 +104,8 @@ class Environment:
 
     def mutate_agents(self):
         for agent in self.agents.values():
-            agent.mutate()
+            if agent.id >= self.reproduction_population:
+                agent.mutate()
 
     def toggleGraphAnimation(self):
         self.animate_graph = not self.animate_graph
@@ -128,8 +129,8 @@ class Environment:
         for i in range(self.reproduction_population):
             new_agent = self.get_fittest_agent()
             if new_agent is None:
+                print("Help")
                 continue
-            self.agents.pop(new_agent.id, None)
             new_agent.id = i
             new_agents.update({new_agent.id: new_agent})
 

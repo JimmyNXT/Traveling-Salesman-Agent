@@ -38,7 +38,7 @@ class Vertex:
         
 
         draw.circle(self.window, colour, [self.position.x, self.position.y], self.radius)
-        text:Surface = self.font.render(str(self.id + 1), True, Color(0, 0, 0))
+        text:Surface = self.font.render(str(self.id), True, Color(0, 0, 0))
         text_rect:Rect = text.get_rect()
         text_rect.center = (int(self.position.x), int(self.position.y))
 
