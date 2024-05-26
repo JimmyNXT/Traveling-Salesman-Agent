@@ -14,6 +14,8 @@ from heuristic import (
     RandomHeuristic,
 )
 from weighted_heuristic import WeightedHeuristic
+from pathlib import Path
+import json
 
 
 class Environment:
@@ -25,7 +27,7 @@ class Environment:
         self.animate_graph: bool = True
         self.run_agents: bool = False
         self.heuristics: list[IHeuristic] = self.getHeuristics()
-        self.base_genes: dict[int, float] = {0: 1, 1: 100, 2: 1, 3: 1, 4: 1}
+        self.base_genes: dict[int, float] = self.load_genes()
         self.agent_count: int = 100
         self.reproduction_population: int = 10
         self.populate_agents()
@@ -44,6 +46,30 @@ class Environment:
 
         return heuristics
 
+    def load_genes(self) -> dict[int,float]:
+        gene_file_path = Path("./data/genes.json")
+        
+        if not gene_file_path.exists():
+            return {1: 100, 2: 1, 3: 1, 4: 1}
+        
+        gene_data:dict[int, float] = {} 
+        with open(gene_file_path, "r") as gene_file:
+            gene_data = json.load(gene_file)
+
+        gene_data = {int(k):float(v) for k,v in gene_data.items()}
+
+        return gene_data
+
+    def save_genes(self):
+        fittest_agent = self.get_fittest_agent()
+        if fittest_agent is None:
+            return
+
+        genes:dict[int, float] = fittest_agent.get_genes()
+
+        with open("./data/genes.json", "w") as gene_file:
+            json.dump(genes, gene_file)
+
     def populate_agents(self):
         self.agents.clear()
         for i in range(self.agent_count):
@@ -53,7 +79,7 @@ class Environment:
                 if weight is None:
                     weight = 0
 
-                weight = weight + random.uniform(weight - 10, weight + 10)
+                weight = weight + random.uniform(-10, 10)
 
                 weigted_heuristics.append(WeightedHeuristic(weight, heuristic))
 
@@ -95,6 +121,7 @@ class Environment:
         #     agent.reset()
 
     def propogate(self):
+        self.save_genes()
         self.generation = self.generation + 1
         new_agents:dict[int,Agent] = {}
         for i in range(self.reproduction_population):
