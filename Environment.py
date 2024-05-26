@@ -62,13 +62,18 @@ class Environment:
             )
 
     def agents_Done(self) -> bool:
-        done_counter: int = 0
+        done_counter: int = 0 
         for agent in self.agents.values():
             if done_counter >= self.reproduction_population:
                 return True
             if agent.done:
                 done_counter = done_counter + 1
-        return False
+
+        for agent in self.agents.values():
+            if agent.should_continue:
+                return False
+        
+        return True
 
     def mutate_agents(self):
         for agent in self.agents.values():

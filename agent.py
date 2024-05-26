@@ -22,6 +22,7 @@ class Agent:
         self.distance_traveled:float = 0
         self.logger = Logger("Agent " + str(self.id))
         self.done = False
+        self.should_continue = True
 
     def __lt__(self, obj):
         if self.done and not obj.done:
@@ -57,8 +58,8 @@ class Agent:
                 ]) + "\n"
 
     def _check_done(self):
-        if len(self.viseted_vertexes) > len(self.graph.vertexes.keys()) * 10:
-            self.done = True
+        if len(self.viseted_vertexes) > len(self.graph.vertexes.keys()) * 3:
+            self.should_continue = False
             return
 
         graph_vertexes_copy = self.graph.vertexes.copy()
@@ -70,6 +71,7 @@ class Agent:
                 pass
 
         if len(graph_vertexes_copy.keys()) <= 0:
+            self.should_continue = False
             self.done = True
 
     def mutate(self):
@@ -81,6 +83,7 @@ class Agent:
         self.viseted_vertexes = []
         self.distance_traveled = 0
         self.done = False
+        self.should_continue = True
 
     def get_path_string(self):
         visited_rev:list[int] = self.viseted_vertexes.copy()
@@ -98,6 +101,9 @@ class Agent:
 
     def update(self):
         if self.done:
+            return
+
+        if not self.should_continue:
             return
 
         avaliable_vertex_ids:list[int] = self.graph.get_neighbours(self.current_vertex_id)
